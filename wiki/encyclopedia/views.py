@@ -1,3 +1,5 @@
+from urllib import request
+
 from django.shortcuts import render, redirect
 import markdown2
 from . import util
@@ -45,4 +47,28 @@ def search(request):
         "results": results
     })
 
+def create(request):
+    if request.method == 'POST':
+        title = request.POST.get('title').strip()
+        content = request.POST.get('content').strip()
 
+        if util.get_entry(title) is not None:
+            return render(request, 'encyclopedia/create.html', {
+                "error_message": "An entry with this title already exists."
+            })
+
+        util.save_entry(title, content)
+        return redirect('entry', title=title)
+    return render(request, 'encyclopedia/create.html')
+
+def edit(request, title):
+    if request.method == 'POST':
+        updated_content = request.POST.get('content').strip()
+        util.save_entry(title, updated_content)
+        return redirect('entry', title=title)
+    else:
+        content = util.get_entry(title)
+        return render(request, 'encyclopedia/edit.html', {
+            "title": title,
+            "content": content
+        })

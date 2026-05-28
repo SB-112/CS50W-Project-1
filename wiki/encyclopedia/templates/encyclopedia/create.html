@@ -1,0 +1,16 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block body %}
+    <h1>Create New Entry</h1>
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+    <form action="{% url 'create' %}" method="post">
+        {% csrf_token %}
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title"><br>
+        <label for="content">Content:</label><br>
+        <textarea id="content" name="content"></textarea>
+        <button type="submit">Create Entry</button>
+    </form>
+{% endblock %}
