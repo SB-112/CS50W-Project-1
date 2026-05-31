@@ -1,7 +1,7 @@
 from urllib import request
 
 from django.shortcuts import render, redirect
-import markdown2
+import markdown2, random
 from . import util
 
 
@@ -19,15 +19,16 @@ def entry(request, title):
             break  
 
     unconverted_html = util.get_entry(title)
-    markdown_text = markdown2.markdown(unconverted_html)
     
     if unconverted_html is None:
         return render (request, "encyclopedia/error.html")
-    else:
-        return render(request, "encyclopedia/entry.html", {
-            "title": title,
-            "content": markdown_text
-        })
+
+    markdown_text = markdown2.markdown(unconverted_html)
+
+    return render(request, "encyclopedia/entry.html", {
+        "title": title,
+        "content": markdown_text
+    })
 
 def search(request):
     query = request.GET.get('q', '').strip()
@@ -54,7 +55,9 @@ def create(request):
 
         if util.get_entry(title) is not None:
             return render(request, 'encyclopedia/create.html', {
-                "error_message": "An entry with this title already exists."
+                "error_message": "An entry with this title already exists.",
+                "title": title,
+                "content": content
             })
 
         util.save_entry(title, content)
@@ -72,3 +75,8 @@ def edit(request, title):
             "title": title,
             "content": content
         })
+    
+def random_entry(request):
+    entries = util.list_entries()
+    random_entry = random   .choice(entries)
+    return redirect('entry', title=random_entry)    
